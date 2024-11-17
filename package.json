@@ -17,6 +17,7 @@
     "ioredis": "^5.4.1",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
+    "libphonenumber-js": "^1.11.14",
     "mysql2": "^3.11.4",
     "require-directory": "^2.1.1",
     "sequelize": "^6.37.5",

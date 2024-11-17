@@ -35,10 +35,6 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.STRING,
                 defaultValue: null
             },
-            isActive: {
-                type: Sequelize.BOOLEAN,
-                defaultValue: true
-            },
             updatedAt: {
                 type: Sequelize.BIGINT,
                 defaultValue: null

@@ -1,5 +1,6 @@
 const joi = require('joi');
 const HttpStatusCode = require('http-status-codes');
+const {isValidPhoneNumber, parsePhoneNumberWithError} = require('libphonenumber-js');
 
 class AuthValidator {
     constructor() {
@@ -9,9 +10,35 @@ class AuthValidator {
         try {
             await joi
                 .object({
-                    userName: joi.string().max(100).required(),
-                    password: joi.string().max(99).required()
+                    eMail: joi.string().email().max(100).when('phoneNumber', {
+                        is: joi.exist(),
+                        then: joi.forbidden(),
+                        otherwise: joi.required()
+                    }),
+                    phoneNumber: joi.string().custom((value, helpers) => {
+                        if (!req.body.countryCode || req.body.countryCode.trim() === '') {
+                            return helpers.message('Country code is required');
+                        }
+
+                        const fullPhoneNumber = req.body.countryCode + value;
+
+                        if (!isValidPhoneNumber(fullPhoneNumber, {defaultCountry: req.body.countryCode})) {
+                            return helpers.message('Phone number is not valid');
+                        }
+                        return value;
+                    }),
+                    countryCode: joi.string()
+                        .min(1)
+                        .max(5)
+                        .when('phoneNumber', {
+                            is: joi.exist(),
+                            then: joi.required(),
+                            otherwise: joi.optional()
+                        }),
+                    password: joi.string().max(99).required(),
+                    rememberMe: joi.boolean().default(false)
                 })
+                .xor('eMail', 'phoneNumber')
                 .validateAsync(req.body);
             next();
         } catch (err) {

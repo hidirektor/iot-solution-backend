@@ -76,7 +76,12 @@ class AuthController {
     async loginAsync(req, res) {
         try {
             const findUser = await userCrud.findOne({
-                userName: req.body.userName
+                where: {
+                    [db.Sequelize.Op.or]: [
+                        req.body.eMail ? {eMail: req.body.eMail} : null,
+                        req.body.phoneNumber ? {phoneNumber: req.body.phoneNumber} : null
+                    ].filter(condition => condition !== null)
+                }
             });
 
             if (!findUser.status) {
@@ -86,11 +91,7 @@ class AuthController {
                 );
             }
 
-            const passwordIsValid = await bcrypt.compare(
-                req.body.password,
-                findUser.result.password
-            );
-
+            const passwordIsValid = await bcrypt.compare(req.body.password, findUser.result.password);
             if (!passwordIsValid) {
                 throw errorSender.errorObject(
                     HttpStatusCode.BAD_REQUEST,
@@ -98,23 +99,24 @@ class AuthController {
                 );
             }
 
+            const tokenExpiration = req.body.rememberMe ? '365d' : '1d';
+
             const payload = {
                 userID: findUser.result.userID,
-                userType: findUser.result.userType,
-                userStatus: findUser.result.userStatus
+                userType: findUser.result.userType
             };
 
-            const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
-                expiresIn: '7d'
+            const accessToken = jwt.sign(payload, process.env.SECRET_KEY, {
+                expiresIn: tokenExpiration
             });
 
-            const deviceInfo = req.body.deviceInfo || req.headers['user-agent'];
+            const finalDeviceInfo = req.headers['user-agent'];
 
             // Redis'te kullanıcı bilgilerini ve token'ı sakla
             const redisKey = `auth_${findUser.result.userID}`;
             const redisValue = JSON.stringify({
                 token: accessToken,
-                deviceInfo: deviceInfo,
+                deviceInfo: finalDeviceInfo,
                 loginTime: new Date().toISOString(),
                 userName: findUser.result.userName,
                 userType: findUser.result.userType

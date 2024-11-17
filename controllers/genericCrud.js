@@ -13,7 +13,7 @@ class GenericCRUD {
 
     setWhere(where) {
         this.where = where;
-        if (where === null || where == undefined) this.where = '';
+        if (where === null || where === undefined) this.where = '';
     }
 
     async create(data) {
@@ -55,7 +55,7 @@ class GenericCRUD {
 
     async findOne(object) {
         try {
-            const where = Object.assign(object, this.where);
+            const where = Object.assign(object.where, this.where);
             const item = await this.model.findOne({where: where});
             this.setWhere();
             if (!item) {

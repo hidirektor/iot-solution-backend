@@ -48,7 +48,11 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.ENUM,
                 values: [roles.USER, roles.SUBUSER, roles.MERCHANT, roles.TECHNICIAN, roles.ENGINEER, roles.IT, roles.SYSOP],
                 allowNull: false
-            }
+            },
+            isActive: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: true
+            },
         },
         {
             timestamps: false,
