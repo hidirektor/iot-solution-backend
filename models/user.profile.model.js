@@ -35,16 +35,21 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.STRING,
                 defaultValue: null
             },
+            isActive: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: true
+            },
+            updatedAt: {
+                type: Sequelize.BIGINT,
+                defaultValue: null
+            },
             createdAt: {
                 type: Sequelize.BIGINT,
                 defaultValue: () => Math.floor(Date.now() / 1000)
             },
-            isActive: {
-                type: Sequelize.BOOLEAN,
-                defaultValue: true
-            }
         },
         {
+            timestamps: false,
             charset: 'utf8',
             collate: 'utf8_general_ci'
         }

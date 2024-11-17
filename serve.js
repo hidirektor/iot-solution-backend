@@ -6,7 +6,7 @@ app.get('/', function (req, res) {
     res.json('Complete IoT Solution');
 });
 
-//app.use('/api/v3/auth', routers.authRouter);
+app.use('/api/v1/auth', routers.authRouter);
 //app.use('/api/v3/user', routers.userRouter);
 //app.use('/api/v3/file', routers.fileRouter);
 
